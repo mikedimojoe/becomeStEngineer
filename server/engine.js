@@ -174,7 +174,7 @@ function computeState(rows) {
     const codeScore = exs.length ? exs.reduce((s, e) => s + (e.score || 0), 0) / exs.length : null;
     const started = objCount > 0 || p.quiz_attempts > 0 || exs.some(e => e.attempts > 0);
     let score = null;
-    if (started) {
+    if (started && complete) {
       if (codeScore !== null && quizScore !== null) score = 0.7 * codeScore + 0.3 * quizScore;
       else if (codeScore !== null && exs.some(e => e.attempts)) score = quizScore === null ? codeScore : 0.7 * codeScore + 0.3 * quizScore;
       else if (quizScore !== null) score = codeScore === null ? quizScore : 0.3 * quizScore;
@@ -199,7 +199,8 @@ function computeState(rows) {
   for (const a of Cn.areas) {
     const levels = [...new Set(a.modules.map(m => m.level))].sort();
     let niveau = 0;
-    for (let L = 1; L <= 6; L++) { if (meets(a.id, L)) niveau = L; else break; }
+    const minLevel = Math.min(...levels);
+    for (let L = 1; L <= 6; L++) { if (meets(a.id, L)) { if (L >= minLevel) niveau = L; } else break; }
     const maxLevel = Math.max(...levels);
     if (niveau > maxLevel) niveau = maxLevel;
     const byLevel = {};
