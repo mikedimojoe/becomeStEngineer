@@ -315,7 +315,7 @@
         const stopDist = v > 0 ? v * v / (2 * ax.dec) : 0;
         let nv;
         if (Math.abs(dist) <= stopDist + 1e-9) nv = Math.max(v - ax.dec * dt, 0);
-        else nv = Math.min(v + ax.acc * dt, ax.vmax);
+        else nv = v > ax.vmax ? Math.max(v - ax.dec * dt, ax.vmax) : Math.min(v + ax.acc * dt, ax.vmax);
         let step = nv * dt;
         if (step >= Math.abs(dist) - 1e-9 || (nv === 0 && Math.abs(dist) < Math.max(1e-6, ax.dec * dt * dt))) {
           ax.position = ax.target; ax.velocity = 0; ax.mode = 'idle'; ax.doneCmd = ax.cmd;
@@ -336,6 +336,10 @@
         if (ax.velocity === 0) { ax.doneCmd = ax.cmd; ax.mode = ax.mode === 'stop' ? 'stopped' : 'idle'; }
         break;
       default: ax.velocity = 0;
+    }
+    if (ax.mode === 'jog' && ax.homed) { // Tippen stoppt an der Software-Endlage (kein Fehler)
+      if (cfg.min !== undefined && ax.position <= cfg.min && ax.velocity < 0) { ax.position = cfg.min; ax.velocity = 0; ax.vtarget = 0; }
+      if (cfg.max !== undefined && ax.position >= cfg.max && ax.velocity > 0) { ax.position = cfg.max; ax.velocity = 0; ax.vtarget = 0; }
     }
     if (cfg.min !== undefined && ax.homed && ax.position < cfg.min) { ax.position = cfg.min; ax.velocity = 0; axisError(ax, AX_ERR.SW_LIMIT); }
     if (cfg.max !== undefined && ax.homed && ax.position > cfg.max) { ax.position = cfg.max; ax.velocity = 0; axisError(ax, AX_ERR.SW_LIMIT); }
@@ -530,7 +534,7 @@
   function installControl(rt) {
     struct(rt, 'MTPIDParametersType', [['Gain', 'REAL', 1], ['IntegrationTime', 'REAL', 0], ['DerivativeTime', 'REAL', 0], ['FilterTime', 'REAL', 0]]);
     nativeFB(rt, { name: 'MTBasicsPID',
-      in: [['Enable', 'BOOL'], ['PIDParameters', 'MTPIDParametersType'], ['MinOut', 'REAL', -100], ['MaxOut', 'REAL', 100], ['Invert', 'BOOL'], ['Update', 'BOOL'], ['SetValue', 'REAL'], ['ActualValue', 'REAL'], ['HoldOut', 'BOOL'], ['TrackingValue', 'REAL'], ['EnableTracking', 'BOOL']],
+      in: [['Enable', 'BOOL'], ['PIDParameters', 'MTPIDParametersType'], ['MinOut', 'REAL', -100], ['MaxOut', 'REAL', 100], ['Invert', 'BOOL'], ['Update', 'BOOL'], ['SetValue', 'REAL'], ['ActValue', 'REAL'], ['HoldOut', 'BOOL'], ['TrackingValue', 'REAL'], ['EnableTracking', 'BOOL']],
       out: [['Active', 'BOOL'], ['Error', 'BOOL'], ['StatusID', 'DINT'], ['UpdateDone', 'BOOL'], ['Out', 'REAL'], ['ControlError', 'REAL'], ['ProportionalPart', 'REAL'], ['IntegrationPart', 'REAL'], ['DerivativePart', 'REAL'], ['TrackingActive', 'BOOL']],
       state: () => ({ i: 0, prevE: 0, d: 0, first: true }),
       exec(i, r, s) {
@@ -539,7 +543,7 @@
         if (i.minout >= i.maxout) { i.error = true; i.statusid = -1; i.active = false; return; }
         i.error = false; i.statusid = 0; i.active = true; i.updatedone = i.update;
         const dt = r.dt;
-        let e = i.setvalue - i.actualvalue; if (i.invert) e = -e;
+        let e = i.setvalue - i.actvalue; if (i.invert) e = -e;
         const kp = P.gain;
         const pPart = kp * e;
         let dPart = 0;
@@ -587,7 +591,7 @@
   }
 
   // ---------- Kommunikation (AsTCP-ähnlich, simulierte Gegenstelle) ----------
-  const TCP = { ERR_OK: 0, ERR_FUB_BUSY: 65535, ERR_FUB_ENABLE_FALSE: 65534, tcpERR_NO_DATA: 32650, tcpERR_NOT_CONNECTED: 32651, tcpERR_INVALID_IDENT: 32600, tcpERR_INVALID: 32601, tcpERR_SOCKET_CREATE: 32602, tcpERR_TIMEOUT: 32652 };
+  const TCP = { ERR_OK: 0, ERR_FUB_BUSY: 65535, ERR_FUB_ENABLE_FALSE: 65534, tcpERR_NO_DATA: 32605, tcpERR_NOT_CONNECTED: 32609, tcpERR_INVALID_IDENT: 32600, tcpERR_INVALID: 32608, tcpERR_SOCKET_CREATE: 32602, tcpERR_TIMEOUT: 32652 };
   function tcpState(rt) { return rt.sim.tcp || (rt.sim.tcp = { sockets: new Map(), next: 1001, server: rt.tcpServer || { ip: '127.0.0.1', port: 5000, mode: 'echo' } }); }
   function asyncFB(rt, name, ins, outs, startFn) {
     nativeFB(rt, { name, in: [['enable', 'BOOL'], ...ins], out: [['status', 'UINT'], ...outs], state: () => ({ pending: 0 }),

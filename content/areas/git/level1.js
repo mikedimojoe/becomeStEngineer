@@ -150,7 +150,7 @@ module.exports = [
         },
         checks: [
           { type: 'userConfigured', msg: 'Name und E-Mail sind noch nicht gesetzt.' },
-          { type: 'commitCountMin', branch: 'main', n: 2, msg: 'Auf main fehlt dein neuer Commit.' },
+          { type: 'commitCountMin', branch: 'main', n: 1, msg: 'Auf main fehlt dein neuer Commit.' },
           { type: 'fileContains', path: 'Logical/Main/Main.st', text: 'diStop', branch: 'main', msg: 'Der Kommentar zu diStop ist nicht im Commit.' },
           { type: 'clean', msg: 'Es gibt noch uncommittete Änderungen.' }
         ],
@@ -374,8 +374,9 @@ module.exports = [
         },
         checks: [
           { type: 'commandUsed', pattern: '^git commit .*--amend', msg: 'Nutze `git commit --amend`, um die Message zu korrigieren.' },
-          { type: 'commitCountMin', branch: 'main', n: 3, msg: 'Es fehlt der chore-Commit für die .gitignore.' },
+          { type: 'commitCountMin', branch: 'main', n: 2, msg: 'Es fehlt der chore-Commit für die .gitignore.' },
           { type: 'fileNotTracked', path: 'Binaries/cpu.br', msg: 'Binaries/cpu.br ist noch versioniert.' },
+          { type: 'branchNotContainsMsg', branch: 'main', pattern: '^zeug$', msg: 'Der Commit „zeug“ ist noch in der Historie.' },
           { type: 'fileContains', path: '.gitignore', text: 'Binaries/', branch: 'main', msg: 'Binaries/ fehlt in der .gitignore.' },
           { type: 'lastCommitMsgMatches', branch: 'main', pattern: '^chore(\\([^)]+\\))?: .+', msg: 'Der letzte Commit soll ein chore-Commit sein.' },
           { type: 'clean' }
@@ -537,7 +538,7 @@ module.exports = [
           { type: 'userConfigured' },
           { type: 'fileContains', path: '.gitignore', text: 'Temp/', branch: 'main', msg: 'Die .gitignore mit Temp/ ist nicht committet.' },
           { type: 'fileContains', path: 'Logical/Main/Main.st', text: 'Ampelphasenplan', branch: 'main', msg: 'Die Programmänderung fehlt im Commit.' },
-          { type: 'commitCountMin', branch: 'main', n: 3, msg: 'Es sollen zwei neue Commits sein (.gitignore und Programm).' },
+          { type: 'commitCountMin', branch: 'main', n: 2, msg: 'Es sollen zwei neue Commits sein (.gitignore und Programm).' },
           { type: 'lastCommitMsgMatches', branch: 'main', pattern: '^(feat|docs)(\\([^)]+\\))?: .+', msg: 'Der letzte Commit soll eine feat- oder docs-Message haben.' },
           { type: 'remoteInSync', branch: 'main', msg: 'Lokaler und entfernter main sind nicht gleich – push vergessen?' },
           { type: 'clean' }

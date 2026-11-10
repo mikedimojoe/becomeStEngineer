@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entwurf A · Werkbank</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#ED8934;--navy:#1B3A4A;--anth:#465157;--anth2:#2D3235;--grau:#D7D8D6;--taupe:#A29376;--kupfer:#B1886B;
+--bg:#F6F6F5;--panel:#fff;--line:#E4E5E3;--text:#22292D;--muted:#6B7479;--ok:#2F7D5B;--bad:#B5432F;
+--f:"Open Sans",Arial,sans-serif;--mono:"JetBrains Mono",Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+nav{background:var(--panel);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brand b{color:var(--orange);font-weight:800;letter-spacing:.04em;font-size:18px}
+.brand small{display:block;font-size:10px;letter-spacing:.16em;color:var(--anth2);font-weight:600}
+nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;color:var(--anth);text-decoration:none;font-weight:600}
+nav a.on{background:#F1F2F0;color:var(--navy)}
+nav a svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7}
+nav .sep{height:1px;background:var(--line);margin:10px 4px}
+nav .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 10px 2px}
+main{padding:24px 32px;display:grid;gap:20px;grid-template-columns:1fr 340px;align-content:start}
+.top{grid-column:1/-1;display:flex;align-items:center;gap:16px}
+.top h1{font-size:20px;color:var(--navy);font-weight:700}
+.top .sp{flex:1}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--anth);font-weight:600}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:14px}
+/* Stufen-Leiste */
+.track{grid-column:1/-1}
+.stages{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px}
+.stg{position:relative;padding:12px 10px 10px;border-radius:8px;background:#F4F4F3;border:1px solid transparent}
+.stg .n{font-size:11px;color:var(--muted);font-weight:600}
+.stg .t{font-weight:700;color:var(--anth2)}
+.stg.done{background:#fff;border-color:var(--line)}
+.stg.done .t{color:var(--navy)}
+.stg.cur{background:var(--navy);color:#fff}
+.stg.cur .t,.stg.cur .n{color:#fff}
+.stg .bar{height:4px;border-radius:2px;background:rgba(255,255,255,.2);margin-top:10px;overflow:hidden}
+.stg .bar i{display:block;height:100%;width:44%;background:var(--orange)}
+.stg svg{position:absolute;right:10px;top:12px;width:16px;height:16px}
+/* Nächster Schritt */
+.next{border:1px solid var(--orange);box-shadow:0 0 0 4px rgba(237,137,52,.1)}
+.next .tag{display:inline-flex;gap:6px;align-items:center;font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.1em}
+.next h3{font-size:22px;color:var(--navy);margin:8px 0 6px;line-height:1.25}
+.next p{color:var(--anth)}
+.next .meta{display:flex;gap:14px;margin:14px 0 18px;color:var(--muted);font-size:12px;font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;font-family:inherit;font-size:14px}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+/* Kompetenzen */
+.areas{display:grid;gap:10px}
+.ar{display:grid;grid-template-columns:14px 1fr 52px 34px;align-items:center;gap:10px}
+.ar .dot{width:10px;height:10px;border-radius:3px}
+.ar .nm{font-weight:600;color:var(--anth2)}
+.ar .pb{height:6px;background:#EEEFED;border-radius:3px;overflow:hidden}
+.ar .pb i{display:block;height:100%;background:var(--navy)}
+.ar .lv{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.ar.locked .nm{color:#A3A9AC}
+/* Modul */
+.mod{grid-column:1/2;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.obj{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.obj:last-child{border:0}
+.ck{width:18px;height:18px;border-radius:5px;border:1.5px solid #B9BEC0;flex:none;margin-top:1px;display:grid;place-items:center}
+.ck.on{background:var(--navy);border-color:var(--navy)}
+.ck.act{border-color:var(--orange);box-shadow:0 0 0 3px rgba(237,137,52,.18)}
+.obj.act b{color:var(--navy)}
+pre{font-family:var(--mono);font-size:12.5px;background:#1E2427;color:#D6DCDE;border-radius:10px;padding:14px 16px;line-height:1.6;overflow:auto}
+.kw{color:#F0A35E}.id{color:#9CC6DA}.cm{color:#7B878C}
+.tests{margin-top:10px;display:grid;gap:6px}
+.tst{display:flex;gap:8px;align-items:center;font-size:13px}
+.tst i{width:8px;height:8px;border-radius:50%}
+.side{display:grid;gap:20px;align-content:start}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpi div{background:#F7F7F6;border-radius:8px;padding:10px 12px}
+.kpi b{display:block;font-size:20px;color:var(--navy)}
+.kpi span{font-size:12px;color:var(--muted)}
+</style></head><body>
+<div class="app">
+<nav>
+  <div class="brand"><svg width="26" height="20" viewBox="0 0 26 20"><path d="M1 1h24L13 19z" fill="#2D3235"/></svg><div><b>BREITNER</b><small>ST ENGINEER</small></div></div>
+  <a class="on" href="#"><svg viewBox="0 0 16 16"><path d="M2 8.5 8 3l6 5.5V14H2z"/></svg>Übersicht</a>
+  <a href="#"><svg viewBox="0 0 16 16"><circle cx="3" cy="8" r="2"/><circle cx="13" cy="3" r="2"/><circle cx="13" cy="13" r="2"/><path d="M5 8h3l3-4M8 8l3 4"/></svg>Lernpfad</a>
+  <a href="#"><svg viewBox="0 0 16 16"><path d="M5 4 1 8l4 4M11 4l4 4-4 4"/></svg>Code-Labor</a>
+  <a href="#"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>Prüfungen</a>
+  <a href="#"><svg viewBox="0 0 16 16"><path d="M2 13V7M6 13V3M10 13V9M14 13V5"/></svg>Fortschritt</a>
+  <a href="#"><svg viewBox="0 0 16 16"><path d="M3 2h8l2 2v10H3z M6 6h4M6 9h4"/></svg>Quellen</a>
+  <div class="sep"></div><div class="lbl">Ausbildung</div>
+  <a href="#"><svg viewBox="0 0 16 16"><circle cx="6" cy="5" r="2.5"/><path d="M1.5 14c.5-3 2.3-4.5 4.5-4.5s4 1.5 4.5 4.5M11 3a2.3 2.3 0 0 1 0 4.5M12.5 9.5c1.3.6 2 2 2.2 4"/></svg>Gruppen &amp; Bewertung</a>
+</nav>
+<main>
+  <div class="top"><h1>Guten Morgen, Lena</h1><span class="chip">Duales Studium 2026</span><div class="sp"></div><span class="chip">1.840 KP</span><div class="avatar">LH</div></div>
+  <section class="card track"><h2>Stufen</h2><div class="stages" id="stages"></div></section>
+  <section class="card next">
+    <span class="tag"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6h7M6 2.5 9.5 6 6 9.5" stroke="#ED8934" stroke-width="1.8" fill="none"/></svg>Nächster Schritt</span>
+    <h3 id="nt"></h3><p id="nw"></p>
+    <div class="meta"><span id="nm"></span><span>Steuerungslogik · Junior</span></div>
+    <button class="btn">Modul fortsetzen <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h9M7 3l4 4-4 4" stroke="#fff" stroke-width="1.8" fill="none"/></svg></button>
+    <button class="btn ghost">Zum Lernpfad</button>
+    <p style="margin-top:14px;font-size:12px;color:var(--muted)" id="nu"></p>
+  </section>
+  <aside class="side" style="grid-row:3/5;grid-column:2">
+    <section class="card"><h2>Kompetenzen</h2><div class="areas" id="areas"></div></section>
+    <section class="card"><h2>Diese Woche</h2><div class="kpi"><div><b>6,5 h</b><span>Lernzeit</span></div><div><b>3</b><span>Module abgeschlossen</span></div><div><b>92 %</b><span>Code-Tests bestanden</span></div><div><b>2,1</b><span>Note Junior-Bereich</span></div></div></section>
+  </aside>
+  <section class="mod">
+    <div class="card"><h2>Ziele im Modul</h2><div id="objs"></div></div>
+    <div class="card"><h2>Code · Main.st</h2><pre id="code"></pre><div class="tests" id="tests"></div></div>
+  </section>
+</main></div>
+<script src="_content.js"></script>
+<script>
+const M=MOCK;
+document.getElementById('stages').innerHTML=M.stages.map((s,i)=>{const st=i<M.user.stage-1?'done':i===M.user.stage-1?'cur':'';
+ const ic=st==='done'?'<svg viewBox="0 0 16 16"><path d="M3 8.5 6.5 12 13 4.5" stroke="#2F7D5B" stroke-width="2" fill="none"/></svg>':i>M.user.stage-1?'<svg viewBox="0 0 16 16"><rect x="4" y="7" width="8" height="6" rx="1.5" fill="none" stroke="#A3A9AC" stroke-width="1.5"/><path d="M6 7V5a2 2 0 0 1 4 0v2" fill="none" stroke="#A3A9AC" stroke-width="1.5"/></svg>':'';
+ return `<div class="stg ${st}"><div class="n">Stufe ${i+1}</div><div class="t">${s}</div>${ic}${st==='cur'?'<div class="bar"><i></i></div>':''}</div>`}).join('');
+nt.textContent=M.next.title; nw.textContent=M.next.why; nm.textContent=`ca. ${M.next.minutes} min · +${M.next.kp} KP`; nu.textContent=M.next.unlocks;
+areas.innerHTML=M.areas.map(a=>`<div class="ar ${a.locked?'locked':''}"><span class="dot" style="background:${a.locked?'#D7D8D6':a.color}"></span><span class="nm">${a.name}</span><span class="pb"><i style="width:${a.pct}%;background:${a.color}"></i></span><span class="lv">N${a.lvl}</span></div>`).join('');
+objs.innerHTML=M.module.objectives.map(o=>`<div class="obj ${o.active?'act':''}"><span class="ck ${o.done?'on':''} ${o.active?'act':''}">${o.done?'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M1.5 5 4 7.5 8.5 2.5" stroke="#fff" stroke-width="1.8" fill="none"/></svg>':''}</span><span>${o.active?'<b>':''}${o.t}${o.active?'</b>':''}</span></div>`).join('');
+code.innerHTML=M.code.replace(/\b(CASE|OF|IF|THEN|END_IF|END_CASE|TRUE)\b/g,'<span class="kw">$1</span>').replace(/\b(ST_\w+)\b/g,'<span class="id">$1</span>');
+tests.innerHTML=M.module.tests.map(([t,ok])=>`<div class="tst"><i style="background:${ok?'var(--ok)':'var(--bad)'}"></i>${t}</div>`).join('');
+</script></body></html>

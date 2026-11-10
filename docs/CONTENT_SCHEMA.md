@@ -203,7 +203,7 @@ Jeder Test startet mit einer frischen Instanz (`_INIT` läuft). Gute Tests prüf
   * PLCopen (vereinfacht, eine simulierte Achse pro Instanz-Name `Axis`): `MC_Power, MC_Home, MC_MoveAbsolute,
     MC_MoveRelative, MC_MoveVelocity, MC_Stop, MC_Halt, MC_Reset, MC_ReadActualPosition` mit Parameter `Axis := gAxis01`
     (globale Variable vom Typ `AXIS_REF` in `io` mit `type: 'AXIS_REF'` anlegen).
-  * mapp Control: `MTBasicsPID` (Enable, PIDParameters.Gain/IntegrationTime/DerivativeTime, SetValue, ActualValue,
+  * mapp Control: `MTBasicsPID` (Enable, PIDParameters.Gain/IntegrationTime/DerivativeTime, SetValue, ActValue,
     MinOut, MaxOut → Out, Active, Error), `MTBasicsPT1` (Enable, Gain, TimeConstant, In → Out).
   * Kommunikation (simulierte Gegenstelle): `TcpOpen, TcpClient, TcpSend, TcpRecv, TcpClose` (AsTCP-ähnlich:
     `enable, pIfAddr… → status, ident`; status 0 = ok, 65535 = busy), Echo-Server auf 127.0.0.1:5000.

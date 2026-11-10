@@ -133,7 +133,7 @@ module.exports = [
         },
         checks: [
           { type: 'commandUsed', pattern: '^git (switch -c|checkout -b) feature/tippbetrieb', msg: 'Lege den Branch mit `git switch -c` an.' },
-          { type: 'commitCountMin', branch: 'feature/tippbetrieb', n: 4, msg: 'Auf dem Feature-Branch fehlen Commits (zwei neue erwartet).' },
+          { type: 'commitCountMin', branch: 'feature/tippbetrieb', n: 2, msg: 'Auf dem Feature-Branch fehlen Commits (zwei neue erwartet).' },
           { type: 'merged', from: 'feature/tippbetrieb', into: 'main', msg: 'feature/tippbetrieb ist noch nicht in main gemergt.' },
           { type: 'commandUsed', pattern: '^git merge .*--no-ff', msg: 'Merge mit `--no-ff`, damit ein Merge-Commit entsteht.' },
           { type: 'fileContains', path: 'Logical/Main/Main.st', text: 'Tippbetrieb', branch: 'main' },
@@ -328,9 +328,9 @@ module.exports = [
       {
         id: 'ex1', type: 'git', title: 'Konflikt im Blinker lösen',
         task: L(
-          'Auf `main` wurde die Blinkzeit auf `T#1s` geändert. Auf `feature/freigabe` wurde der Blinker um die Freigabe `bEnable` erweitert – in derselben Zeile.',
+          'Ein Kollege hat auf `main` (auf dem Server) die Blinkzeit auf `T#1s` geändert. Auf `feature/freigabe` wurde der Blinker um die Freigabe `bEnable` erweitert – in derselben Zeile.',
           '',
-          '1. Führe `feature/freigabe` in `main` zusammen.',
+          '1. Hole zuerst mit `git pull` den neuen Stand von `main` (ein Kollege hat die Blinkzeit geändert). Der Branch `feature/freigabe` liegt bisher nur auf dem Server (`origin/feature/freigabe`). Hole ihn mit `git switch feature/freigabe` als lokalen Tracking-Branch, wechsle zurück auf `main` und führe ihn dort zusammen.',
           '2. Löse den Konflikt so, dass **beide** Änderungen erhalten bleiben: Die Zeile muss `fbBlink(IN := bEnable AND NOT fbBlink.Q, PT := T#1s);` lauten.',
           '3. Die Datei `Logical/Main/Main.st` soll danach diesen Inhalt haben:',
           '',
@@ -350,7 +350,8 @@ module.exports = [
           cloned: true,
           remote: SERVER + 'meldeleuchte.git',
           files: Object.assign(asProject('Meldeleuchte', BLINK_MAIN), { '.gitignore': GITIGNORE_AS }),
-          commits: [{ msg: 'fix(blink): Blinkfrequenz auf 0,5 Hz gesenkt', files: { 'Logical/Main/Main.st': L('PROGRAM _INIT', 'END_PROGRAM', '', 'PROGRAM _CYCLIC', '\tfbBlink(IN := NOT fbBlink.Q, PT := T#1s);', '\tdoLamp := fbBlink.Q;', 'END_PROGRAM') } }],
+          commits: [],
+          remoteCommits: [{ branch: 'main', author: 'Kollege', msg: 'fix(blink): Blinkfrequenz auf 0,5 Hz gesenkt', files: { 'Logical/Main/Main.st': L('PROGRAM _INIT', 'END_PROGRAM', '', 'PROGRAM _CYCLIC', '\tfbBlink(IN := NOT fbBlink.Q, PT := T#1s);', '\tdoLamp := fbBlink.Q;', 'END_PROGRAM') } }],
           branches: {
             'feature/freigabe': [{ msg: 'feat(blink): Blinker nur mit Freigabe', files: { 'Logical/Main/Main.st': L('PROGRAM _INIT', 'END_PROGRAM', '', 'PROGRAM _CYCLIC', '\tfbBlink(IN := bEnable AND NOT fbBlink.Q, PT := T#500ms);', '\tdoLamp := fbBlink.Q;', 'END_PROGRAM') } }]
           },
@@ -359,11 +360,15 @@ module.exports = [
         checks: [
           { type: 'merged', from: 'feature/freigabe', into: 'main', msg: 'feature/freigabe ist noch nicht in main gemergt.' },
           { type: 'noConflictMarkers', msg: 'Es stehen noch Konfliktmarker in einer Datei.' },
+          { type: 'headCommitIsMerge', msg: 'Der letzte Commit muss der Merge-Commit sein.' },
           { type: 'fileContains', path: 'Logical/Main/Main.st', text: 'bEnable AND NOT fbBlink.Q, PT := T#1s', branch: 'main', msg: 'Die kombinierte Zeile (Freigabe UND T#1s) fehlt.' },
           { type: 'fileContains', path: 'Logical/Main/Main.st', text: 'doLamp := fbBlink.Q', branch: 'main', msg: 'Die Zuweisung an doLamp ist verloren gegangen.' },
           { type: 'clean' }
         ],
         solution: [
+          'git pull',
+          'git switch feature/freigabe',
+          'git switch main',
           'git merge feature/freigabe',
           'git status',
           'cat Logical/Main/Main.st',
@@ -380,9 +385,9 @@ module.exports = [
       {
         id: 'ex2', type: 'git', title: 'Merge abbrechen, neu ansetzen und beide Variablen behalten',
         task: L(
-          'Du und eine Kollegin habt in `Logical/Main/Main.var` an derselben Stelle je eine neue Variable ergänzt: auf `main` `nPartCount : UDINT;`, auf `feature/stoerung` `bFault : BOOL;`.',
+          'In `Logical/Main/Main.var` wurde an derselben Stelle je eine neue Variable ergänzt: auf `main` (Server, von einer Kollegin) `nPartCount : UDINT;`, auf `feature/stoerung` `bFault : BOOL;`.',
           '',
-          '1. Starte den Merge von `feature/stoerung` in `main` und sieh dir den Konflikt an.',
+          '1. Hole mit `git pull` den aktuellen `main`. Hole dann den Server-Branch lokal (`git switch feature/stoerung`, dann zurück auf `main`), starte den Merge von `feature/stoerung` in `main` und sieh dir den Konflikt an.',
           '2. Brich den Merge mit `git merge --abort` ab (z. B. weil du erst Rücksprache halten willst) und prüfe mit `git status`, dass alles wieder sauber ist.',
           '3. Führe den Merge erneut aus und löse ihn so, dass **beide** Variablen deklariert sind:',
           '',
@@ -401,7 +406,8 @@ module.exports = [
           cloned: true,
           remote: SERVER + 'foerderband.git',
           files: Object.assign(asProject('Foerderband'), { '.gitignore': GITIGNORE_AS }),
-          commits: [{ msg: 'feat(zaehler): Teilezähler-Variable', files: { 'Logical/Main/Main.var': L('VAR', '\tbStop : BOOL;', '\tnPartCount : UDINT;', 'END_VAR') } }],
+          commits: [],
+          remoteCommits: [{ branch: 'main', author: 'Kollegin', msg: 'feat(zaehler): Teilezähler-Variable', files: { 'Logical/Main/Main.var': L('VAR', '\tbStop : BOOL;', '\tnPartCount : UDINT;', 'END_VAR') } }],
           branches: {
             'feature/stoerung': [{ msg: 'feat(stoerung): Störungsmerker', files: { 'Logical/Main/Main.var': L('VAR', '\tbStop : BOOL;', '\tbFault : BOOL;', 'END_VAR') } }]
           },
@@ -411,11 +417,15 @@ module.exports = [
           { type: 'commandUsed', pattern: '^git merge --abort', msg: 'Brich den ersten Merge-Versuch mit `git merge --abort` ab.' },
           { type: 'merged', from: 'feature/stoerung', into: 'main' },
           { type: 'noConflictMarkers' },
+          { type: 'headCommitIsMerge', msg: 'Der Merge wurde nicht als Merge-Commit abgeschlossen.' },
           { type: 'fileContains', path: 'Logical/Main/Main.var', text: 'nPartCount : UDINT;', branch: 'main', msg: 'nPartCount fehlt nach dem Merge.' },
           { type: 'fileContains', path: 'Logical/Main/Main.var', text: 'bFault : BOOL;', branch: 'main', msg: 'bFault fehlt nach dem Merge.' },
           { type: 'clean' }
         ],
         solution: [
+          'git pull',
+          'git switch feature/stoerung',
+          'git switch main',
           'git merge feature/stoerung',
           'cat Logical/Main/Main.var',
           'git merge --abort',
@@ -640,7 +650,7 @@ module.exports = [
           'git push',
           'git pull',
           'git push',
-          'git log --oneline --graph -n 5'
+          'git log --oneline --graph -5'
         ]
       }
     ],

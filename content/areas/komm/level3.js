@@ -170,7 +170,7 @@ module.exports = [
         hints: ['Werte den Zustand mit `CASE gMachine.Status.State OF` aus.', 'Setze am Ende des Zyklus alle drei Befehlsbits auf FALSE.', 'LIMIT(0.0, gMachine.Par.SpeedSet, 100.0)'],
         cycleMs: 10,
         io: [
-          { name: 'gMachine', type: 'typMachineIf', dir: 'in', label: 'OPC-UA-Schnittstelle (Client schreibt Cmd/Par, liest Status)' },
+          { name: 'gMachine', type: 'typMachineIf', dir: 'out', label: 'OPC-UA-Schnittstelle (Client schreibt Cmd/Par, liest Status)' },
           { name: 'diFault', type: 'BOOL', dir: 'in', label: 'Störung Antrieb', widget: 'switch' }
         ],
         scene: { type: 'generic' },
@@ -193,7 +193,18 @@ END_PROGRAM
 		Stop : BOOL;
 		Reset : BOOL;
 	END_STRUCT;
-	(* TODO: typMachinePar, typMachineStatus, typMachineIf ergänzen *)
+	typMachinePar : STRUCT
+		SpeedSet : REAL;
+	END_STRUCT;
+	typMachineStatus : STRUCT
+		State : INT;
+		(* TODO: Running, ErrorId, SpeedAct, Heartbeat ergänzen *)
+	END_STRUCT;
+	typMachineIf : STRUCT
+		Cmd : typMachineCmd;
+		Par : typMachinePar;
+		Status : typMachineStatus;
+	END_STRUCT;
 END_TYPE
 `
         },

@@ -533,6 +533,7 @@
         needRepo(st);
         const n = +(optVal('-n') || (a.find(x => /^-\d+$/.test(x)) || '').slice(1)) || 1e9;
         const one = flags.has('--oneline');
+        const nv = optVal('-n'); if (nv !== undefined) { const ix = args.indexOf(nv); if (ix >= 0) args.splice(ix, 1); }
         const starts = flags.has('--all') ? [...Object.values(R.branches), ...Object.values(R.remoteRefs)] : [resolve(st, R, args[0] || 'HEAD')];
         if (!starts[0] && !flags.has('--all')) { if (!headHash(R)) throw new GitErr(`fatal: your current branch '${R.HEAD.branch}' does not have any commits yet`); throw new GitErr(`fatal: ambiguous argument '${args[0]}': unknown revision`); }
         const set = new Set(); starts.forEach(h => ancestors(R, h).forEach(x => set.add(x)));

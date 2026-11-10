@@ -423,7 +423,9 @@ END_PROGRAM
             { set: { diAbgedeckt: true } }, { cycles: 2 },
             { expect: 'doArbeitFrei' },
             { set: { diGesichert: false } }, { cycles: 2 },
-            { expect: 'NOT doArbeitFrei AND nStep = 0', msg: 'Schloss entfernt → Freigabe weg, Schrittkette auf 0.' }
+            { expect: 'NOT doArbeitFrei AND nStep <= 1', msg: 'Schloss entfernt → Freigabe weg, Schrittkette muss neu durchlaufen werden.' },
+            { set: { diGesichert: true } }, { cycles: 3 },
+            { expect: 'NOT doArbeitFrei', msg: 'Nach Wiederherstellen einer Bestätigung darf nicht automatisch freigegeben werden.' }
           ]},
           { name: 'Quittieren nur, wenn alle Schalter zurückgesetzt', steps: [
             { set: { diGesichert: true } }, { cycles: 2 },

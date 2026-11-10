@@ -498,7 +498,9 @@
         }
         if (lt.k === 'ENUM' && rt.k === 'ENUM' && lt.name !== rt.name) this.err(`Vergleich verschiedener Enum-Typen ${lt.name} und ${rt.name}`, n);
         const real32 = (lt.k === 'REAL' || rt.k === 'REAL');
+        const f32 = real32 && !(lt.k === 'REAL' && lt.bits === 64 && !lt.lit) && !(rt.k === 'REAL' && rt.bits === 64 && !rt.lit);
         const f = { '=': (a, b) => a === b, '<>': (a, b) => a !== b, '<': (a, b) => a < b, '>': (a, b) => a > b, '<=': (a, b) => a <= b, '>=': (a, b) => a >= b }[op];
+        if (f32) return { ty: T.BOOL, ev: env => f(Math.fround(le(env)), Math.fround(re(env))) };
         if (real32) return { ty: T.BOOL, ev: env => f(+le(env), +re(env)) };
         return { ty: T.BOOL, ev: env => f(le(env), re(env)) };
       }

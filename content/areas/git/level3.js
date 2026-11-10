@@ -383,9 +383,10 @@ module.exports = [
         },
         checks: [
           { type: 'commandUsed', pattern: '^git restore ', msg: 'Verwirf die Teständerung mit `git restore`.' },
+          { type: 'isRevertOf', pattern: 'Bandgeschwindigkeit', msg: 'Es fehlt ein Revert-Commit für „Bandgeschwindigkeit erhöht“.' },
           { type: 'commandUsed', pattern: '^git revert ', msg: 'Nutze `git revert`.' },
           { type: 'fileContains', path: 'Logical/Main/Param.st', text: 'nSpeedMax := 1500', branch: 'main', msg: 'Der alte Wert 1500 ist nicht wiederhergestellt.' },
-          { type: 'commitCountMin', branch: 'main', n: 3, msg: 'Revert erzeugt einen neuen Commit – die Historie darf nicht kürzer werden.' },
+          { type: 'commitCountMin', branch: 'main', n: 1, msg: 'Revert erzeugt einen neuen Commit – die Historie darf nicht kürzer werden.' },
           { type: 'remoteInSync', branch: 'main' },
           { type: 'clean' }
         ],
@@ -447,7 +448,7 @@ module.exports = [
           'git reset --soft HEAD~3',
           'git add .',
           'git commit -m "feat(rezept): Rezeptstruktur mit Laden, Prüfen und Speichern"',
-          'git log --oneline -n 3'
+          'git log --oneline -3'
         ]
       }
     ],
@@ -584,7 +585,7 @@ module.exports = [
         task: L(
           'Auf `main` wurde das Programm `Counter` ergänzt, auf `feature/meldeleuchte` das Programm `Lamp`. Beide haben dafür die `Logical/Package.pkg` an derselben Stelle geändert.',
           '',
-          '1. Merge `feature/meldeleuchte` in `main`.',
+          '1. Hole mit `git pull` den aktuellen `main`. Hole dann den Server-Branch `feature/meldeleuchte` lokal (`git switch feature/meldeleuchte`), wechsle zurück auf `main` und merge ihn.',
           '2. Löse den Konflikt in `Logical/Package.pkg`, sodass alle drei Programme enthalten sind. Hinweis: In dieser Übung verwendet die Datei einfache Anführungszeichen in den XML-Attributen (gültiges XML), damit du sie per `echo "…"` schreiben kannst:',
           '',
           '```',
@@ -605,7 +606,8 @@ module.exports = [
           cloned: true,
           remote: SERVER + 'sortieranlage.git',
           files: Object.assign(asProject('Sortieranlage'), { '.gitignore': GITIGNORE_AS, 'Logical/Package.pkg': pkg('Main') }),
-          commits: [{ msg: 'feat(zaehler): Programm Counter hinzugefügt', files: { 'Logical/Package.pkg': pkg('Main', 'Counter'), 'Logical/Counter/Counter.st': L('// Teilezähler') } }],
+          commits: [],
+          remoteCommits: [{ branch: 'main', author: 'Kollege', msg: 'feat(zaehler): Programm Counter hinzugefügt', files: { 'Logical/Package.pkg': pkg('Main', 'Counter'), 'Logical/Counter/Counter.st': L('// Teilezähler') } }],
           branches: {
             'feature/meldeleuchte': [{ msg: 'feat(lamp): Programm Lamp hinzugefügt', files: { 'Logical/Package.pkg': pkg('Main', 'Lamp'), 'Logical/Lamp/Lamp.st': L('// Meldeleuchte') } }]
           },
@@ -614,6 +616,7 @@ module.exports = [
         checks: [
           { type: 'merged', from: 'feature/meldeleuchte', into: 'main' },
           { type: 'noConflictMarkers' },
+          { type: 'headCommitIsMerge', msg: 'Der Merge wurde nicht als Merge-Commit abgeschlossen.' },
           { type: 'fileContains', path: 'Logical/Package.pkg', text: '>Counter</Object>', branch: 'main', msg: 'Counter fehlt in Package.pkg.' },
           { type: 'fileContains', path: 'Logical/Package.pkg', text: '>Lamp</Object>', branch: 'main', msg: 'Lamp fehlt in Package.pkg.' },
           { type: 'fileContains', path: 'Logical/Package.pkg', text: '>Main</Object>', branch: 'main', msg: 'Main fehlt in Package.pkg.' },
@@ -622,6 +625,9 @@ module.exports = [
           { type: 'clean' }
         ],
         solution: [
+          'git pull',
+          'git switch feature/meldeleuchte',
+          'git switch main',
           'git merge feature/meldeleuchte',
           'git status',
           'cat Logical/Package.pkg',

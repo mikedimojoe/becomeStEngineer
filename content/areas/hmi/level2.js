@@ -111,7 +111,7 @@ const EX_CONV = {
   ],
   cycleMs: 10,
   io: [
-    { name: 'gHmi', type: 'ConvHmi_typ', dir: 'in', label: 'HMI-Schnittstelle (OPC UA)' },
+    { name: 'gHmi', type: 'ConvHmi_typ', dir: 'in', writable: true, label: 'HMI-Schnittstelle (OPC UA)' },
     { name: 'diPartSensor', type: 'BOOL', dir: 'in', label: 'Lichtschranke B1 Teileerkennung', widget: 'button' },
     { name: 'doMotor', type: 'BOOL', dir: 'out', label: 'Schütz K1 Bandmotor', widget: 'led' },
     { name: 'aoSpeed', type: 'REAL', dir: 'out', label: 'Sollwert Umrichter', widget: 'gauge', min: 0, max: 100, unit: '%' }
@@ -419,7 +419,7 @@ Die Datentypen in \`Types.typ\` sind vorgegeben. Die Anlage (Hubtisch, 0,5 Hub/s
   ],
   cycleMs: 10,
   io: [
-    { name: 'gHmi', type: 'LiftHmi_typ', dir: 'in', label: 'HMI-Schnittstelle (OPC UA)' },
+    { name: 'gHmi', type: 'LiftHmi_typ', dir: 'in', writable: true, label: 'HMI-Schnittstelle (OPC UA)' },
     { name: 'diTop', type: 'BOOL', dir: 'in', label: 'Endschalter oben B2' },
     { name: 'diBottom', type: 'BOOL', dir: 'in', label: 'Endschalter unten B1' },
     { name: 'aiStroke', type: 'REAL', dir: 'in', label: 'Hubposition 0…1', widget: 'gauge', min: 0, max: 1 },

@@ -63,7 +63,7 @@ const pnp3 = svg(360, 170,
 
 // PT100 in 2-, 3-, 4-Leiter (nur 3-Leiter gezeichnet)
 const pt3 = svg(340, 150,
-  `<rect x="40" y="50" width="24" height="50"/>` + T(52, 40, 'Pt100', 'middle') +
+  `<rect x="40" y="50" width="24" height="50"/>` + T(36, 80, 'Pt100', 'end') +
   L(52, 50, 52, 30) + L(52, 30, 220, 30) + L(52, 100, 52, 120) + L(52, 120, 220, 120) + L(80, 120, 80, 75) + L(80, 75, 220, 75) +
   dot(80, 120) +
   `<rect x="220" y="15" width="100" height="120"/>` + T(270, 145, 'Messmodul', 'middle') +

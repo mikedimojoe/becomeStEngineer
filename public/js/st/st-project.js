@@ -378,7 +378,7 @@
           tr.step = i;
           if (st.set) for (const [k, v] of Object.entries(st.set)) proj.set(k, v);
           if (st.cycles) for (let c = 0; c < st.cycles; c++) proj.cycle();
-          if (st.ms) proj.runMs(st.ms);
+          if (st.ms && !st.never) proj.runMs(st.ms);
           if (st.expect) {
             const r = proj.eval(st.expect);
             if (r.type.k !== 'BOOL') throw new Error('Test-Ausdruck ist nicht BOOL: ' + st.expect);
