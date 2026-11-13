@@ -51,4 +51,3 @@ node server/server.js            # oder: npm start / ./start.sh / start.bat (Win
 - Nicht im Simulator: `REFERENCE TO`/Pointer-Arithmetik; Git `rebase`, `cherry-pick`, `bisect`, Submodule.
 - Video-Vorschaubilder werden von YouTube geladen (ohne Internet fehlen nur die Bilder).
 - `becomestengineer.zip` im Ordner ist ein lokaler Export (per `.gitignore` ausgeschlossen) und kann gelöscht werden.
-- GitHub meldet beim Push „repository moved“ auf `https://github.com/mikedimojoe/becomeStEngineer.git` (nur Groß-/Kleinschreibung); optional `git remote set-url origin https://github.com/mikedimojoe/becomeStEngineer.git`.
